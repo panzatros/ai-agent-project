@@ -38,20 +38,25 @@ handle_cancellation_schema = {
     }
 }
 
-handle_complain_schema = {
+handle_complaint_schema = {
+    "type": "function",
     "function": {
-        "name": "handle_compalin",
-        "description": "Check on the customer comments, and make some appropiate suggestions on how to solve the proble trying to keep the customer",
+        "name": "handle_complaint",
+        "description": "Handles a customer complaint or cancellation request by generating a persuasive response with product suggestions and incentives, using data from Couchbase.",
         "parameters": {
             "type": "object",
             "properties": {
                 "customer_id": {
                     "type": "string",
-                    "description": "The unique ID of the customer requesting cancellation."
+                    "description": "The unique ID of the customer with the complaint or cancellation request."
                 },
                 "style": {
                     "type": "string",
-                    "description": "The style code of the product they wish to cancel."
+                    "description": "The style code of the product related to the complaint or cancellation."
+                },
+                "complaint": {
+                    "type": "string",
+                    "description": "The customer's specific complaint or reason for cancellation (optional, null for first-time cancellation)."
                 }
             },
             "required": ["customer_id", "style"]

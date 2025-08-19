@@ -9,7 +9,6 @@ from routes.routes import routes  # Ensure routes are registered
 
 app.register_blueprint(routes)
 
-#xai-3X1g8HGnUrMJyOOtfAA9ZqyhH1Kz6KbYD5amkprJpRVEfmVwnimTqKwcU2zSwcsxsZfOFQD54JDBinvF
 
 if __name__ == "__main__":
     print("Starting Flask server with Simple AI Agent...")

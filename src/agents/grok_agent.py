@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class SimpleAgent:
-    def __init__(self, model_name: str = "grok-4", api_key: str = "xai-3X1g8HGnUrMJyOOtfAA9ZqyhH1Kz6KbYD5amkprJpRVEfmVwnimTqKwcU2zSwcsxsZfOFQD54JDBinvF"):
+    def __init__(self, model_name: str = "grok-4", api_key: str = "key"):
         self.model_name = model_name
         self.api_key = api_key
         self.tools = {}
@@ -18,12 +18,15 @@ class SimpleAgent:
         self.system_prompt = (
             "You are the best Sales AI this side of the Mississippi. "
             "Your task is to convince people not to cancel and to buy as much as possible. "
-            "You have access to tools that can help you with this task. "
-            "Use them when you think they will help. "
-            "If you need to use a tool, call it by name and provide the necessary arguments. "
-            "If you don't know the answer, use the tools to find it. "
-            "If you don't know how to use a tool, ask the user for help."
-            "you are a chat bot try to keep the responses clean and simple and avoid details that the client does not need to know. "
+            "You have access to the 'handle_complaint' tool, which processes cancellation requests and generates persuasive messages. "
+            "When a user requests to cancel an order, use the 'handle_complaint' tool with the provided customer_id and style. "
+            "Provide the tool's arguments in JSON format, e.g., Tool Call: get_order_details(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\")"
+            "if complain is not present on the request, it means that is the beggining of the chat, so you can fill it with something like \"this is the beggining on the chat no complain yet, we muct ask why the user is disgruntle with product \""
+            "Do not generate a text description of the tool call; invoke the tool directly."
+            "this is like a chatbot directly talking to the  customer, with that im mind try to keep it clean and short without unnecesary details"
+            "please check previous messages and assure that you are not repeating yourself, and that you are not asking the same question twice. "
+            "also use them as reference to keep a coherent conversation with the user. "
+            "use the customer_id as reference to know if the customer is having a conversation or not "
         )
 
     def register_tool(self, schema: Dict, function: Callable):
@@ -47,6 +50,7 @@ class SimpleAgent:
                 "messages": messages
             }
             if use_tools and self.tool_schemas:
+                logger.debug("Using tools in Grok API request in chat")
                 payload["tools"] = self.tool_schemas
             logger.debug(f"Sending Grok API request in chat: {json.dumps(payload, indent=2)}")
             # Log the full request details
@@ -63,6 +67,7 @@ class SimpleAgent:
             response_data = response.json()
             logger.debug(f"Grok API response in chat: {json.dumps(response_data, indent=2)}")
             if use_tools and response_data.get("choices", [{}])[0].get("message", {}).get("tool_calls"):
+                logger.debug("Handling tool calls in response")
                 return self._handle_tool_calls(message, response_data)
             return response_data["choices"][0]["message"]["content"]
         except requests.exceptions.HTTPError as e:
