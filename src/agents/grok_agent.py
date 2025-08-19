@@ -18,7 +18,7 @@ CUSTOMERS_BUCKET_NAME = "customer_data"
 
 
 class SimpleAgent:
-    def __init__(self, model_name: str = "grok-4", api_key: str = "xai-PWcd8SSnvZ9UmzNlazXqQ4UApFpwPyvWg8wSAUQU5mHJrcC73PLOzlPJS3ljvpt1XttDD3LidTi37kwu"):
+    def __init__(self, model_name: str = "grok-4", api_key: str = "xai-key"):
         self.model_name = model_name
         self.api_key = api_key
         self.tools = {}
