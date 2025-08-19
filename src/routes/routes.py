@@ -62,7 +62,7 @@ def cancel_order():
     except Exception as e:
         logger.error(f"Error in cancel_order: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
+"""
 @routes.route('/retain', methods=['POST'])
 def handle_complain():
     try:
@@ -78,6 +78,28 @@ def handle_complain():
             response = agent.chat(f"Handle cancellation for customer {customer_id} and style {style}", use_tools=True)
         else:
             response = agent.chat(f"Handle complaint for customer {customer_id} and style {style} with complain: {complain}")
+        return jsonify({"message": response}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+"""
+
+    
+@routes.route('/retain', methods=['POST'])
+def handle_complain():
+    try:
+        data = request.get_json()
+        customer_id = data.get('customer_id')
+        style = data.get('style')
+        complaint = data.get('complaint')  # Can be None for first-time cancellation
+        if not customer_id or not style:
+            return jsonify({"error": "Missing customer_id or style"}), 400
+
+        # Use the agent to call the handle_complaint tool
+        response = agent.chat(
+            f"Handle complaint or cancellation for customer {customer_id} and style {style} with complaint: {complaint or 'None'}",
+            customer_id=customer_id,
+            use_tools=True
+        )
         return jsonify({"message": response}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -83,7 +83,7 @@ def get_similar_products(category: str, exclude_style: str, limit: int = 3) -> l
         logger.error(f"Error fetching similar products for category {category}: {str(e)}")
         return []
 
-def handle_complaint(customer_id: str, style: str, complaint: str , api_key: str) -> str:
+def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str, agent: 'SimpleAgent' = None) -> str:
     logger.debug(f"Handling complaint for customer_id: {customer_id}, style: {style}, complaint: {complaint}")
     
     customer = get_customer(customer_id)
@@ -99,14 +99,12 @@ def handle_complaint(customer_id: str, style: str, complaint: str , api_key: str
     if not purchase:
         return f"No purchase of {style} found for customer {customer_id}."
 
-    # Fetch similar products for suggestions
     similar_products = get_similar_products(customer.get("preferred_category", product["category"]), style)
     similar_products_text = "\n".join([
         f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, Fit: {p['fit']}, Occasion: {p['occasion']})"
         for p in similar_products
     ]) if similar_products else "No similar products found."
 
-    # Determine discount based on loyalty level
     discount_offer = ""
     if customer.get("loyalty_level") in ["Gold", "Platinum"]:
         discount_offer = "As a valued {loyalty_level} customer, we’re offering you a 15% discount on your next purchase or free shipping on this order to ensure your satisfaction."
@@ -115,7 +113,6 @@ def handle_complaint(customer_id: str, style: str, complaint: str , api_key: str
     else:
         discount_offer = "We’d love to offer you a 5% discount on your next purchase to show our appreciation."
 
-    # Craft prompt based on whether complaint is provided
     if complaint:
         prompt = (
             f"Customer {customer['name']} (email: {customer['email']}, loyalty: {customer['loyalty_level']}) "
@@ -168,11 +165,18 @@ def handle_complaint(customer_id: str, style: str, complaint: str , api_key: str
         response_data = response.json()
         logger.debug(f"Grok API response in handle_complaint: {json.dumps(response_data, indent=2)}")
         message = response_data["choices"][0]["message"]["content"]
+        # Save the response to conversation history
+        if agent:
+            agent.save_conversation_turn(customer_id, "assistant", message)
         return f"Generated message to send to {customer['email']}:\n\n{message}"
     except requests.exceptions.HTTPError as e:
         error_response = e.response.json() if e.response else {}
         logger.error(f"HTTP error in handle_complaint: {e.response.status_code} - {json.dumps(error_response, indent=2)}")
+        if agent:
+            agent.save_conversation_turn(customer_id, "assistant", f"Error: HTTP {e.response.status_code}")
         return f"Error generating message: HTTP {e.response.status_code} - {json.dumps(error_response, indent=2)}"
     except Exception as e:
         logger.error(f"Error in handle_complaint: {str(e)}")
+        if agent:
+            agent.save_conversation_turn(customer_id, "assistant", f"Error: {str(e)}")
         return f"Error generating message: {str(e)}"

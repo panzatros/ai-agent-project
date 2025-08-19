@@ -3,13 +3,22 @@ from datetime import datetime
 from typing import Dict, Callable, List
 import requests
 import logging
+from couchbase.cluster import Cluster
+from couchbase.auth import PasswordAuthenticator
+from couchbase.options import ClusterOptions, QueryOptions
+from couchbase.exceptions import DocumentNotFoundException
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+COUCHBASE_URL = "couchbase://localhost"
+USERNAME = "Administrator"
+PASSWORD = "Administrator"
+CUSTOMERS_BUCKET_NAME = "customer_data"
+
 
 class SimpleAgent:
-    def __init__(self, model_name: str = "grok-4", api_key: str = "key"):
+    def __init__(self, model_name: str = "grok-4", api_key: str = "xai-PWcd8SSnvZ9UmzNlazXqQ4UApFpwPyvWg8wSAUQU5mHJrcC73PLOzlPJS3ljvpt1XttDD3LidTi37kwu"):
         self.model_name = model_name
         self.api_key = api_key
         self.tools = {}
@@ -23,11 +32,14 @@ class SimpleAgent:
             "Provide the tool's arguments in JSON format, e.g., Tool Call: get_order_details(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\")"
             "if complain is not present on the request, it means that is the beggining of the chat, so you can fill it with something like \"this is the beggining on the chat no complain yet, we muct ask why the user is disgruntle with product \""
             "Do not generate a text description of the tool call; invoke the tool directly."
-            "this is like a chatbot directly talking to the  customer, with that im mind try to keep it clean and short without unnecesary details"
+            "this is like a chatbot directly talking to the  customer, with that im mind try to keep it clean and short without unnecesary details, but recomendations of new products are alway necesary"
             "please check previous messages and assure that you are not repeating yourself, and that you are not asking the same question twice. "
             "also use them as reference to keep a coherent conversation with the user. "
             "use the customer_id as reference to know if the customer is having a conversation or not "
         )
+        self.cluster = Cluster(COUCHBASE_URL, ClusterOptions(PasswordAuthenticator(USERNAME, PASSWORD)))
+        self.customers_bucket = self.cluster.bucket(CUSTOMERS_BUCKET_NAME)
+        self.customers_collection = self.customers_bucket.default_collection()
 
     def register_tool(self, schema: Dict, function: Callable):
         tool_name = schema["function"]["name"]
@@ -35,92 +47,116 @@ class SimpleAgent:
         self.tool_schemas.append({"type": "function", "function": schema["function"]})
         logger.debug(f"Registered tool: {tool_name}")
 
-    def chat(self, message: str, use_tools: bool = True) -> str:
+    def get_conversation_history(self, customer_id: str, limit: int = 10) -> list:
+        """Retrieve the last 'limit' messages for a customer."""
         try:
+            result = self.customers_collection.get(customer_id)
+            customer = result.content_as[dict]
+            history = customer.get("conversation_history", [])
+            logger.debug(f"Retrieved {len(history)} messages for customer {customer_id}")
+            return history[-limit:]  # Return the last 'limit' messages
+        except DocumentNotFoundException:
+            logger.warning(f"No conversation history found for customer {customer_id}")
+            return []
+        except Exception as e:
+            logger.error(f"Error retrieving conversation history for {customer_id}: {str(e)}")
+            return []
+
+    def save_conversation_turn(self, customer_id: str, role: str, content: str):
+        """Save a conversation turn to Couchbase."""
+        try:
+            timestamp = datetime.now().isoformat()
+            message = {"role": role, "content": content, "timestamp": timestamp}
+            result = self.customers_collection.get(customer_id)
+            customer = result.content_as[dict]
+            customer.setdefault("conversation_history", []).append(message)
+            self.customers_collection.upsert(customer_id, customer)
+            logger.debug(f"Saved conversation turn for {customer_id}: {message}")
+        except DocumentNotFoundException:
+            # Create new customer document if it doesn't exist
+            customer = {"conversation_history": [message], "customer_id": customer_id}
+            self.customers_collection.upsert(customer_id, customer)
+            logger.debug(f"Created new customer document with conversation for {customer_id}")
+        except Exception as e:
+            logger.error(f"Error saving conversation turn for {customer_id}: {str(e)}")
+
+    def chat(self, message: str, customer_id: str, use_tools: bool = False) -> str:
+        logger.debug(f"Calling chat with message: {message}, customer_id: {customer_id}, use_tools: {use_tools}")
+        try:
+            # Save user message
+            self.save_conversation_turn(customer_id, "user", message)
+            # Get conversation history
+            history = self.get_conversation_history(customer_id)
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json"
             }
-            messages = [
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": message}
-            ]
+            # Build messages with history
+            messages = [{"role": "system", "content": self.system_prompt}] + history + [{"role": "user", "content": message}]
             payload = {
                 "model": self.model_name,
                 "messages": messages
             }
-            if use_tools and self.tool_schemas:
-                logger.debug("Using tools in Grok API request in chat")
+            if use_tools and self.tools:
                 payload["tools"] = self.tool_schemas
             logger.debug(f"Sending Grok API request in chat: {json.dumps(payload, indent=2)}")
-            # Log the full request details
-            logger.debug(f"Preparing Grok API request in chat with model {self.model_name}:")
-            logger.debug(f"URL: {self.base_url}/chat/completions")
-            logger.debug(f"Headers: {json.dumps(headers, indent=2)}")
-            logger.debug(f"Payload: {json.dumps(payload, indent=2)}")
+            logger.debug(f"Headers: {headers}")
             response = requests.post(
-                f"{self.base_url}/chat/completions",
+                "https://api.x.ai/v1/chat/completions",
                 headers=headers,
                 json=payload
             )
             response.raise_for_status()
             response_data = response.json()
             logger.debug(f"Grok API response in chat: {json.dumps(response_data, indent=2)}")
-            if use_tools and response_data.get("choices", [{}])[0].get("message", {}).get("tool_calls"):
-                logger.debug("Handling tool calls in response")
-                return self._handle_tool_calls(message, response_data)
-            return response_data["choices"][0]["message"]["content"]
+            tool_calls = response_data.get("choices", [{}])[0].get("message", {}).get("tool_calls")
+            if isinstance(tool_calls, str):
+                try:
+                    tool_calls = json.loads(tool_calls).get("tool_calls", [])
+                except json.JSONDecodeError:
+                    logger.error("Failed to parse tool_calls string")
+                    tool_calls = []
+            logger.debug(f"Parsed tool_calls: {tool_calls}")
+            if use_tools and tool_calls:
+                logger.debug("Entering tool_calls block")
+                response_content = self._handle_tool_calls(message, response_data)
+                # Save assistant response
+                self.save_conversation_turn(customer_id, "assistant", response_content)
+                return response_content
+            content = response_data["choices"][0]["message"]["content"]
+            # Save assistant response
+            self.save_conversation_turn(customer_id, "assistant", content)
+            return content
         except requests.exceptions.HTTPError as e:
             error_response = e.response.json() if e.response else {}
             logger.error(f"HTTP error in chat: {e.response.status_code} - {json.dumps(error_response, indent=2)}")
+            self.save_conversation_turn(customer_id, "assistant", f"Error: HTTP {e.response.status_code}")
             return f"Error: HTTP {e.response.status_code} - {json.dumps(error_response, indent=2)}"
         except Exception as e:
             logger.error(f"Error in chat: {str(e)}")
+            self.save_conversation_turn(customer_id, "assistant", f"Error: {str(e)}")
             return f"Error: {str(e)}"
 
-    def _handle_tool_calls(self, original_message: str, response: Dict) -> str:
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
-        messages = [
-            {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": original_message},
-            response["choices"][0]["message"]
-        ]
-        for tool_call in response["choices"][0]["message"].get("tool_calls", []):
-            function_name = tool_call["function"]["name"]
-            function_args = tool_call["function"]["arguments"]
-            if isinstance(function_args, str):
-                try:
-                    function_args = json.loads(function_args)
-                except json.JSONDecodeError:
-                    logger.error(f"Invalid function arguments for {function_name}: {function_args}")
-                    return f"Error: Invalid function arguments for {function_name}"
+    def _handle_tool_calls(self, original_message: str, response_data: Dict) -> str:
+        logger.debug(f"Handling tool calls for message: {original_message}")
+        tool_calls = response_data.get("choices", [{}])[0].get("message", {}).get("tool_calls")
+        if isinstance(tool_calls, str):
+            try:
+                tool_calls = json.loads(tool_calls).get("tool_calls", [])
+            except json.JSONDecodeError:
+                logger.error("Failed to parse tool_calls string")
+                return "Error: Invalid tool call format"
+        for tool_call in tool_calls:
+            function_name = tool_call.get("function", {}).get("name")
+            arguments = tool_call.get("function", {}).get("arguments", {})
+            if isinstance(arguments, str):
+                arguments = json.loads(arguments)
             if function_name in self.tools:
+                logger.debug(f"Calling tool {function_name} with arguments: {arguments}")
                 try:
-                    result = self.tools[function_name](**function_args, api_key=self.api_key)
-                    messages.append({
-                        "role": "tool",
-                        "content": str(result),
-                        "tool_call_id": tool_call.get("id", "")
-                    })
+                    result = self.tools[function_name](**arguments, api_key=self.api_key)
+                    return result
                 except Exception as e:
                     logger.error(f"Error executing tool {function_name}: {str(e)}")
                     return f"Error executing tool {function_name}: {str(e)}"
-            else:
-                logger.error(f"Tool {function_name} not found")
-                return f"Error: Tool {function_name} not found"
-        logger.debug(f"Sending tool response to Grok API: {json.dumps(messages, indent=2)}")
-        final_response = requests.post(
-            f"{self.base_url}/chat/completions",
-            headers=headers,
-            json={
-                "model": self.model_name,
-                "messages": messages
-            }
-        )
-        final_response.raise_for_status()
-        response_data = final_response.json()
-        logger.debug(f"Final Grok API response: {json.dumps(response_data, indent=2)}")
-        return response_data["choices"][0]["message"]["content"]
+        return "No valid tool calls found"
