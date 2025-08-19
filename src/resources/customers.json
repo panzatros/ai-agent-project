@@ -1,0 +1,911 @@
+[
+  {
+    "customer_id": "CUST001",
+    "name": "Customer 1",
+    "email": "customer1@example.com",
+    "age": 57,
+    "location": "New York, USA",
+    "subscription_date": "2024-10-16",
+    "purchase_history": [
+      {
+        "style": "BL029",
+        "purchase_date": "2024-09-25",
+        "quantity": 1,
+        "amount": 92.365644155,
+        "status": "Shipped - Returned to Seller"
+      },
+      {
+        "style": "SET351",
+        "purchase_date": "2024-12-24",
+        "quantity": 1,
+        "amount": 95.2585046977,
+        "status": "Shipped - Out for Delivery"
+      },
+      {
+        "style": "AN209",
+        "purchase_date": "2025-06-08",
+        "quantity": 3,
+        "amount": 152.1118498244,
+        "status": "Shipped - Delivered to Buyer"
+      },
+      {
+        "style": "SET361",
+        "purchase_date": "2024-11-27",
+        "quantity": 1,
+        "amount": 98.3604129194,
+        "status": "Shipped - Out for Delivery"
+      }
+    ],
+    "total_spent": 438.1,
+    "num_purchases": 4,
+    "last_purchase_date": "2025-06-08",
+    "loyalty_level": "Gold",
+    "email_opt_in": true,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST002",
+    "name": "Customer 2",
+    "email": "customer2@example.com",
+    "age": 32,
+    "location": "Paris, France",
+    "subscription_date": "2024-09-04",
+    "purchase_history": [
+      {
+        "style": "BL101",
+        "purchase_date": "2024-12-16",
+        "quantity": 3,
+        "amount": 30.2368995926,
+        "status": "Shipped - Rejected by Buyer"
+      }
+    ],
+    "total_spent": 30.24,
+    "num_purchases": 1,
+    "last_purchase_date": "2024-12-16",
+    "loyalty_level": "Bronze",
+    "email_opt_in": false,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST003",
+    "name": "Customer 3",
+    "email": "customer3@example.com",
+    "age": 66,
+    "location": "Paris, France",
+    "subscription_date": "2024-04-28",
+    "purchase_history": [
+      {
+        "style": "BL021",
+        "purchase_date": "2025-01-28",
+        "quantity": 1,
+        "amount": 76.8113614792,
+        "status": "Shipped - Out for Delivery"
+      },
+      {
+        "style": "BL026",
+        "purchase_date": "2024-08-20",
+        "quantity": 1,
+        "amount": 97.9051062391,
+        "status": "Shipping"
+      }
+    ],
+    "total_spent": 174.72,
+    "num_purchases": 2,
+    "last_purchase_date": "2025-01-28",
+    "loyalty_level": "Silver",
+    "email_opt_in": false,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST004",
+    "name": "Customer 4",
+    "email": "customer4@example.com",
+    "age": 36,
+    "location": "Tokyo, Japan",
+    "subscription_date": "2024-04-22",
+    "purchase_history": [
+      {
+        "style": "AN204",
+        "purchase_date": "2025-06-25",
+        "quantity": 2,
+        "amount": 179.5731737987,
+        "status": "Pending - Waiting for Pick Up"
+      },
+      {
+        "style": "SET401",
+        "purchase_date": "2024-11-01",
+        "quantity": 2,
+        "amount": 94.7119564216,
+        "status": "Cancelled"
+      },
+      {
+        "style": "SET364",
+        "purchase_date": "2024-09-02",
+        "quantity": 3,
+        "amount": 136.0115169006,
+        "status": "Shipped - Returning to Seller"
+      }
+    ],
+    "total_spent": 410.3,
+    "num_purchases": 3,
+    "last_purchase_date": "2025-06-25",
+    "loyalty_level": "Gold",
+    "email_opt_in": true,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST005",
+    "name": "Customer 5",
+    "email": "customer5@example.com",
+    "age": 40,
+    "location": "Berlin, Germany",
+    "subscription_date": "2024-09-22",
+    "purchase_history": [
+      {
+        "style": "BL095",
+        "purchase_date": "2024-11-12",
+        "quantity": 2,
+        "amount": 33.8024376683,
+        "status": "Shipped"
+      },
+      {
+        "style": "SET384",
+        "purchase_date": "2025-02-22",
+        "quantity": 2,
+        "amount": 100.2684477183,
+        "status": "Shipped"
+      },
+      {
+        "style": "BL020",
+        "purchase_date": "2025-01-24",
+        "quantity": 3,
+        "amount": 277.1964202262,
+        "status": "Shipped - Delivered to Buyer"
+      },
+      {
+        "style": "SET386",
+        "purchase_date": "2025-05-16",
+        "quantity": 3,
+        "amount": 222.4742161097,
+        "status": "Shipped - Lost in Transit"
+      },
+      {
+        "style": "BL100",
+        "purchase_date": "2025-05-20",
+        "quantity": 1,
+        "amount": 87.7109364463,
+        "status": "Pending"
+      }
+    ],
+    "total_spent": 721.45,
+    "num_purchases": 5,
+    "last_purchase_date": "2025-05-20",
+    "loyalty_level": "Gold",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST006",
+    "name": "Customer 6",
+    "email": "customer6@example.com",
+    "age": 64,
+    "location": "Paris, France",
+    "subscription_date": "2025-07-14",
+    "purchase_history": [
+      {
+        "style": "BL011",
+        "purchase_date": "2025-08-13",
+        "quantity": 3,
+        "amount": 122.9641748651,
+        "status": "Shipped"
+      },
+      {
+        "style": "SET351",
+        "purchase_date": "2024-09-06",
+        "quantity": 1,
+        "amount": 85.5830288044,
+        "status": "Shipped - Damaged"
+      },
+      {
+        "style": "SET347",
+        "purchase_date": "2025-07-02",
+        "quantity": 2,
+        "amount": 34.621067612,
+        "status": "Shipped - Rejected by Buyer"
+      },
+      {
+        "style": "BL023",
+        "purchase_date": "2025-03-09",
+        "quantity": 3,
+        "amount": 149.5548380815,
+        "status": "Shipped - Out for Delivery"
+      },
+      {
+        "style": "SET351",
+        "purchase_date": "2025-07-07",
+        "quantity": 2,
+        "amount": 76.8593120699,
+        "status": "Shipped - Out for Delivery"
+      }
+    ],
+    "total_spent": 469.58,
+    "num_purchases": 5,
+    "last_purchase_date": "2025-08-13",
+    "loyalty_level": "Gold",
+    "email_opt_in": true,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST007",
+    "name": "Customer 7",
+    "email": "customer7@example.com",
+    "age": 44,
+    "location": "Toronto, Canada",
+    "subscription_date": "2023-11-14",
+    "purchase_history": [
+      {
+        "style": "BL075",
+        "purchase_date": "2025-01-07",
+        "quantity": 1,
+        "amount": 45.2659371794,
+        "status": "Shipping"
+      },
+      {
+        "style": "SET394",
+        "purchase_date": "2025-05-30",
+        "quantity": 3,
+        "amount": 284.5884060815,
+        "status": "Shipped"
+      },
+      {
+        "style": "BL017",
+        "purchase_date": "2024-12-30",
+        "quantity": 3,
+        "amount": 79.4953797448,
+        "status": "Shipped - Picked Up"
+      },
+      {
+        "style": "BL101",
+        "purchase_date": "2025-01-09",
+        "quantity": 2,
+        "amount": 68.5615811134,
+        "status": "Pending - Waiting for Pick Up"
+      }
+    ],
+    "total_spent": 477.91,
+    "num_purchases": 4,
+    "last_purchase_date": "2025-05-30",
+    "loyalty_level": "Gold",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST008",
+    "name": "Customer 8",
+    "email": "customer8@example.com",
+    "age": 24,
+    "location": "Mumbai, India",
+    "subscription_date": "2024-03-29",
+    "purchase_history": [
+      {
+        "style": "BL019",
+        "purchase_date": "2025-04-12",
+        "quantity": 1,
+        "amount": 58.3279492628,
+        "status": "Shipped"
+      }
+    ],
+    "total_spent": 58.33,
+    "num_purchases": 1,
+    "last_purchase_date": "2025-04-12",
+    "loyalty_level": "Bronze",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST009",
+    "name": "Customer 9",
+    "email": "customer9@example.com",
+    "age": 24,
+    "location": "Toronto, Canada",
+    "subscription_date": "2024-07-15",
+    "purchase_history": [
+      {
+        "style": "SET374",
+        "purchase_date": "2025-06-09",
+        "quantity": 3,
+        "amount": 169.3261521256,
+        "status": "Pending - Waiting for Pick Up"
+      }
+    ],
+    "total_spent": 169.33,
+    "num_purchases": 1,
+    "last_purchase_date": "2025-06-09",
+    "loyalty_level": "Silver",
+    "email_opt_in": true,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST010",
+    "name": "Customer 10",
+    "email": "customer10@example.com",
+    "age": 66,
+    "location": "Toronto, Canada",
+    "subscription_date": "2025-01-29",
+    "purchase_history": [
+      {
+        "style": "SET355",
+        "purchase_date": "2024-11-08",
+        "quantity": 1,
+        "amount": 22.3396741115,
+        "status": "Shipped - Rejected by Buyer"
+      },
+      {
+        "style": "SET374",
+        "purchase_date": "2024-12-15",
+        "quantity": 2,
+        "amount": 104.3598790443,
+        "status": "Pending"
+      },
+      {
+        "style": "BL017",
+        "purchase_date": "2025-01-13",
+        "quantity": 1,
+        "amount": 22.986019367,
+        "status": "Pending"
+      },
+      {
+        "style": "SET348",
+        "purchase_date": "2024-11-11",
+        "quantity": 2,
+        "amount": 125.8428360818,
+        "status": "Shipping"
+      },
+      {
+        "style": "SET383",
+        "purchase_date": "2025-04-05",
+        "quantity": 3,
+        "amount": 185.6915753197,
+        "status": "Shipped - Delivered to Buyer"
+      }
+    ],
+    "total_spent": 461.22,
+    "num_purchases": 5,
+    "last_purchase_date": "2025-04-05",
+    "loyalty_level": "Gold",
+    "email_opt_in": false,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST011",
+    "name": "Customer 11",
+    "email": "customer11@example.com",
+    "age": 58,
+    "location": "New York, USA",
+    "subscription_date": "2025-02-22",
+    "purchase_history": [
+      {
+        "style": "BL026",
+        "purchase_date": "2024-11-30",
+        "quantity": 1,
+        "amount": 68.9598498158,
+        "status": "Shipped"
+      },
+      {
+        "style": "SET431",
+        "purchase_date": "2025-03-31",
+        "quantity": 3,
+        "amount": 86.1319901172,
+        "status": "Pending - Waiting for Pick Up"
+      },
+      {
+        "style": "SET375",
+        "purchase_date": "2024-08-28",
+        "quantity": 1,
+        "amount": 86.1482679289,
+        "status": "Cancelled"
+      }
+    ],
+    "total_spent": 241.24,
+    "num_purchases": 3,
+    "last_purchase_date": "2025-03-31",
+    "loyalty_level": "Silver",
+    "email_opt_in": true,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST012",
+    "name": "Customer 12",
+    "email": "customer12@example.com",
+    "age": 58,
+    "location": "Mumbai, India",
+    "subscription_date": "2023-09-18",
+    "purchase_history": [
+      {
+        "style": "SET340",
+        "purchase_date": "2025-04-01",
+        "quantity": 1,
+        "amount": 13.5900521821,
+        "status": "Pending"
+      },
+      {
+        "style": "AN206",
+        "purchase_date": "2025-04-05",
+        "quantity": 2,
+        "amount": 188.8632310282,
+        "status": "Cancelled"
+      }
+    ],
+    "total_spent": 202.45,
+    "num_purchases": 2,
+    "last_purchase_date": "2025-04-05",
+    "loyalty_level": "Silver",
+    "email_opt_in": false,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST013",
+    "name": "Customer 13",
+    "email": "customer13@example.com",
+    "age": 39,
+    "location": "Sydney, Australia",
+    "subscription_date": "2024-03-13",
+    "purchase_history": [
+      {
+        "style": "BL021",
+        "purchase_date": "2025-01-18",
+        "quantity": 3,
+        "amount": 101.1394035204,
+        "status": "Shipped - Lost in Transit"
+      },
+      {
+        "style": "SET398",
+        "purchase_date": "2024-11-16",
+        "quantity": 1,
+        "amount": 93.917449095,
+        "status": "Shipped - Lost in Transit"
+      }
+    ],
+    "total_spent": 195.06,
+    "num_purchases": 2,
+    "last_purchase_date": "2025-01-18",
+    "loyalty_level": "Silver",
+    "email_opt_in": true,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST014",
+    "name": "Customer 14",
+    "email": "customer14@example.com",
+    "age": 24,
+    "location": "Tokyo, Japan",
+    "subscription_date": "2023-11-11",
+    "purchase_history": [
+      {
+        "style": "BL026",
+        "purchase_date": "2025-06-14",
+        "quantity": 2,
+        "amount": 29.7151544853,
+        "status": "Shipped - Rejected by Buyer"
+      },
+      {
+        "style": "SET386",
+        "purchase_date": "2024-11-12",
+        "quantity": 1,
+        "amount": 30.1032562387,
+        "status": "Shipping"
+      },
+      {
+        "style": "SET442",
+        "purchase_date": "2025-04-23",
+        "quantity": 1,
+        "amount": 30.6270595353,
+        "status": "Shipped"
+      }
+    ],
+    "total_spent": 90.45,
+    "num_purchases": 3,
+    "last_purchase_date": "2025-06-14",
+    "loyalty_level": "Bronze",
+    "email_opt_in": false,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST015",
+    "name": "Customer 15",
+    "email": "customer15@example.com",
+    "age": 32,
+    "location": "New York, USA",
+    "subscription_date": "2024-07-09",
+    "purchase_history": [
+      {
+        "style": "SET376",
+        "purchase_date": "2025-04-05",
+        "quantity": 2,
+        "amount": 104.4078495876,
+        "status": "Shipped - Returning to Seller"
+      }
+    ],
+    "total_spent": 104.41,
+    "num_purchases": 1,
+    "last_purchase_date": "2025-04-05",
+    "loyalty_level": "Silver",
+    "email_opt_in": true,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST016",
+    "name": "Customer 16",
+    "email": "customer16@example.com",
+    "age": 29,
+    "location": "Sydney, Australia",
+    "subscription_date": "2024-06-13",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST017",
+    "name": "Customer 17",
+    "email": "customer17@example.com",
+    "age": 64,
+    "location": "Tokyo, Japan",
+    "subscription_date": "2024-01-26",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST018",
+    "name": "Customer 18",
+    "email": "customer18@example.com",
+    "age": 70,
+    "location": "Sydney, Australia",
+    "subscription_date": "2024-01-14",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST019",
+    "name": "Customer 19",
+    "email": "customer19@example.com",
+    "age": 70,
+    "location": "Sydney, Australia",
+    "subscription_date": "2025-03-04",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST020",
+    "name": "Customer 20",
+    "email": "customer20@example.com",
+    "age": 55,
+    "location": "New York, USA",
+    "subscription_date": "2025-07-12",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST021",
+    "name": "Customer 21",
+    "email": "customer21@example.com",
+    "age": 56,
+    "location": "Tokyo, Japan",
+    "subscription_date": "2025-01-22",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST022",
+    "name": "Customer 22",
+    "email": "customer22@example.com",
+    "age": 64,
+    "location": "Berlin, Germany",
+    "subscription_date": "2024-06-15",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST023",
+    "name": "Customer 23",
+    "email": "customer23@example.com",
+    "age": 59,
+    "location": "New York, USA",
+    "subscription_date": "2025-04-25",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST024",
+    "name": "Customer 24",
+    "email": "customer24@example.com",
+    "age": 68,
+    "location": "Berlin, Germany",
+    "subscription_date": "2023-10-12",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST025",
+    "name": "Customer 25",
+    "email": "customer25@example.com",
+    "age": 56,
+    "location": "Paris, France",
+    "subscription_date": "2023-11-03",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST026",
+    "name": "Customer 26",
+    "email": "customer26@example.com",
+    "age": 63,
+    "location": "Toronto, Canada",
+    "subscription_date": "2023-09-11",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST027",
+    "name": "Customer 27",
+    "email": "customer27@example.com",
+    "age": 20,
+    "location": "London, UK",
+    "subscription_date": "2025-05-28",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST028",
+    "name": "Customer 28",
+    "email": "customer28@example.com",
+    "age": 40,
+    "location": "Tokyo, Japan",
+    "subscription_date": "2023-10-03",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Bottoms"
+  },
+  {
+    "customer_id": "CUST029",
+    "name": "Customer 29",
+    "email": "customer29@example.com",
+    "age": 50,
+    "location": "Tokyo, Japan",
+    "subscription_date": "2024-10-02",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST030",
+    "name": "Customer 30",
+    "email": "customer30@example.com",
+    "age": 61,
+    "location": "Toronto, Canada",
+    "subscription_date": "2023-09-11",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST031",
+    "name": "Customer 31",
+    "email": "customer31@example.com",
+    "age": 26,
+    "location": "Sydney, Australia",
+    "subscription_date": "2024-07-25",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST032",
+    "name": "Customer 32",
+    "email": "customer32@example.com",
+    "age": 38,
+    "location": "Berlin, Germany",
+    "subscription_date": "2023-09-27",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST033",
+    "name": "Customer 33",
+    "email": "customer33@example.com",
+    "age": 64,
+    "location": "Berlin, Germany",
+    "subscription_date": "2024-06-05",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST034",
+    "name": "Customer 34",
+    "email": "customer34@example.com",
+    "age": 43,
+    "location": "Toronto, Canada",
+    "subscription_date": "2025-02-08",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST035",
+    "name": "Customer 35",
+    "email": "customer35@example.com",
+    "age": 53,
+    "location": "Mumbai, India",
+    "subscription_date": "2025-03-26",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST036",
+    "name": "Customer 36",
+    "email": "customer36@example.com",
+    "age": 62,
+    "location": "Berlin, Germany",
+    "subscription_date": "2025-06-02",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Accessories"
+  },
+  {
+    "customer_id": "CUST037",
+    "name": "Customer 37",
+    "email": "customer37@example.com",
+    "age": 48,
+    "location": "Mumbai, India",
+    "subscription_date": "2024-12-09",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Apparel"
+  },
+  {
+    "customer_id": "CUST038",
+    "name": "Customer 38",
+    "email": "customer38@example.com",
+    "age": 48,
+    "location": "Paris, France",
+    "subscription_date": "2025-01-21",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": false,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST039",
+    "name": "Customer 39",
+    "email": "customer39@example.com",
+    "age": 20,
+    "location": "Sydney, Australia",
+    "subscription_date": "2025-01-27",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Sets"
+  },
+  {
+    "customer_id": "CUST040",
+    "name": "Customer 40",
+    "email": "customer40@example.com",
+    "age": 18,
+    "location": "London, UK",
+    "subscription_date": "2024-02-27",
+    "purchase_history": [],
+    "total_spent": 0.0,
+    "num_purchases": 0,
+    "last_purchase_date": null,
+    "loyalty_level": "None",
+    "email_opt_in": true,
+    "preferred_category": "Apparel"
+  }
+]

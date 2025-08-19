@@ -71,7 +71,7 @@ def handle_complain():
         style = data.get('style')
         complain = data.get('complain')
         if not customer_id or not style:
-            return jsonify({"error": "Missing customer_id or style"}), 400
+            return jsonify({"error": "Missing customer_id or product ID"}), 400
 
         # Use the agent to handle the complaint
         if complain is None:
