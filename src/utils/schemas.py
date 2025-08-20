@@ -16,7 +16,6 @@ time_tool_schema = {
     }
 }
 
-
 handle_complaint_schema = {
     "type": "function",
     "function": {

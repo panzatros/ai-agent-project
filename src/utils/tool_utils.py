@@ -103,6 +103,8 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
 
     sales_stats = get_sales_stats(style)
     purchase = next((p for p in customer.get("purchase_history", []) if p["style"] == style), None)
+    if not purchase:
+        return f"No purchase of {style} found for customer {customer_id}."
 
     similar_products = get_similar_products(customer.get("preferred_category", product["category"]), style)
     similar_products_text = "\n".join([
@@ -139,7 +141,7 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "grok-3",
+            "model": "grok-3-mini",
             "messages": [{"role": "user", "content": prompt}]
         }
         logger.debug(f"Sending Grok API request in handle_complaint: {json.dumps(payload, indent=2)}")
@@ -167,14 +169,34 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
             agent.save_conversation_turn(customer_id, "assistant", f"Error: {str(e)}")
         return f"Error generating message: {str(e)}"
 
-def handle_general_question(customer_id: str, question: str, api_key: str, agent: 'SimpleAgent' = None) -> str:
-    logger.debug(f"Handling general question for customer_id: {customer_id}, question: {question}")
+def handle_general_question(customer_id: str, style: str, question: str, api_key: str, agent: 'SimpleAgent' = None) -> str:
+    logger.debug(f"Handling general question for customer_id: {customer_id}, style: {style}, question: {question}")
     
     customer = get_customer(customer_id)
     if not customer:
         return f"Customer {customer_id} not found in Couchbase bucket '{CUSTOMERS_BUCKET_NAME}'."
 
-    similar_products = get_similar_products(customer.get("preferred_category", "General"))
+    # Check if question references a specific product style
+    product_style = style
+    if not product_style:
+        # Try to extract style from question (e.g., "AXSF" in "tell me about product AXSF")
+        style_match = re.search(r'\b[A-Z0-9]{4}\b', question)
+        product_style = style_match.group(0) if style_match else None
+
+    product_details = ""
+    category = customer.get("preferred_category", "General")
+    if product_style:
+        product = get_product(product_style)
+        if product:
+            category = product.get("category", category)
+            product_details = (
+                f"{product['description']} (Style: {product_style}, Price: ${product['price']}, "
+                f"Color: {product['color']}, Fit: {product['fit']}, Occasion: {product['occasion']}). "
+            )
+        else:
+            product_details = f"Product style {product_style} not found. "
+
+    similar_products = get_similar_products(category, product_style)
     similar_products_text = "\n".join([
         f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, Fit: {p['fit']}, Occasion: {p['occasion']})"
         for p in similar_products
@@ -190,10 +212,9 @@ def handle_general_question(customer_id: str, question: str, api_key: str, agent
 
     prompt = (
         f"Customer {customer['name']} ({customer['loyalty_level']}) asked: {question}. "
-        f"Preferred category: {customer['preferred_category']}. Purchase history: {json.dumps(customer['purchase_history'])}. "
-        f"Recommended products: {similar_products_text}. "
-        f"Respond briefly: answer the question clearly, offer {discount_offer}, suggest recommended products, and invite further questions."
-        f"mention some details from the products in the response (e.g., price, color, fit, occasion"
+        f"Preferred category: {category}. Purchase history: {json.dumps(customer['purchase_history'])}. "
+        f"{product_details}Recommended products: {similar_products_text}. "
+        f"Respond briefly: answer the question clearly (include product details if requested), offer {discount_offer}, suggest recommended products, and invite further questions."
     )
 
     try:
@@ -202,7 +223,7 @@ def handle_general_question(customer_id: str, question: str, api_key: str, agent
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "grok-3",
+            "model": "grok-3-mini",
             "messages": [{"role": "user", "content": prompt}]
         }
         logger.debug(f"Sending Grok API request in handle_general_question: {json.dumps(payload, indent=2)}")
