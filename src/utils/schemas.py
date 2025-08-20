@@ -17,27 +17,6 @@ time_tool_schema = {
 }
 
 
-handle_cancellation_schema = {
-    "function": {
-        "name": "handle_cancellation",
-        "description": "Processes a cancellation request by generating and (simulating) sending a persuasive message to retain the order, using data from Couchbase.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "customer_id": {
-                    "type": "string",
-                    "description": "The unique ID of the customer requesting cancellation."
-                },
-                "style": {
-                    "type": "string",
-                    "description": "The style code of the product they wish to cancel."
-                }
-            },
-            "required": ["customer_id", "style"]
-        }
-    }
-}
-
 handle_complaint_schema = {
     "type": "function",
     "function": {
@@ -60,6 +39,32 @@ handle_complaint_schema = {
                 }
             },
             "required": ["customer_id", "style"]
+        }
+    }
+}
+
+handle_general_question_schema = {
+    "type": "function",
+    "function": {
+        "name": "handle_general_question",
+        "description": "Handles a general customer question by generating a concise response with product recommendations and incentives, using data from Couchbase.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "description": "The unique ID of the customer asking the question."
+                },
+                "style": {
+                    "type": "string",
+                    "description": "The style which represent a product, may or may not be on the request."
+                },
+                "question": {
+                    "type": "string",
+                    "description": "The customer's general question."
+                }
+            },
+            "required": ["customer_id", "question"]
         }
     }
 }

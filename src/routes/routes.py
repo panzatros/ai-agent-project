@@ -91,12 +91,12 @@ def handle_complain():
         customer_id = data.get('customer_id')
         style = data.get('style')
         complaint = data.get('complaint')  # Can be None for first-time cancellation
-        if not customer_id or not style:
-            return jsonify({"error": "Missing customer_id or style"}), 400
+        if not customer_id:
+            return jsonify({"error": "Missing customer_id"}), 400
 
         # Use the agent to call the handle_complaint tool
         response = agent.chat(
-            f"Handle complaint or cancellation for customer {customer_id} and style {style} with complaint: {complaint or 'None'}",
+            f"Handle handle the following query form {customer_id} and productID (optional) {style or 'None'} with either a question, a complain or a cancelation request: {complaint or 'None'}",
             customer_id=customer_id,
             use_tools=True
         )

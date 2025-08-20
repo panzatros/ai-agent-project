@@ -18,7 +18,7 @@ CUSTOMERS_BUCKET_NAME = "customer_data"
 
 
 class SimpleAgent:
-    def __init__(self, model_name: str = "grok-3-mini", api_key: str = "xai-key-1234567890abcdef"):
+    def __init__(self, model_name: str = "grok-3-mini", api_key: str = "xai-key"):
         self.model_name = model_name
         self.api_key = api_key
         self.tools = {}
@@ -26,8 +26,9 @@ class SimpleAgent:
         self.base_url = "https://api.x.ai/v1"
         self.system_prompt = (
             "You are a friendly, persuasive Sales AI chatbot. Your goal is to convince customers to keep their orders and explore more products. "
-            "Use the 'handle_complaint' tool for cancellation requests with customer_id and style in JSON format, e.g., Tool Call: get_order_details(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\"). "
-            "If no complaint is provided, assume it's the start of the chat and use a default complaint like 'initial chat, ask why customer is considering cancellation'. "
+            "Use 'handle_complaint' tool for cancellation or complaint requests with customer_id and style in JSON format, e.g., Tool Call: handle_complaint(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\"). "
+            "Use 'handle_general_question' tool for general questions with customer_id, style (optional), and question (passed as complaint when style is absent) in JSON format, e.g., Tool Call: handle_general_question(customer_id=\"CUST005\", style=\"AN209\", question=\"What are your latest products?\"). "
+            "If no complaint or style is provided, assume it's the start of the chat and use a default like 'initial chat, ask what the customer needs help with'. "
             "Keep responses short, engaging, and professional. Always recommend alternative products. "
             "Check previous messages to avoid repetition and maintain coherent conversation using customer_id as reference."
         )
