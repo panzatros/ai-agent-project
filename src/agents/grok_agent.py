@@ -18,7 +18,7 @@ CUSTOMERS_BUCKET_NAME = "customer_data"
 
 
 class SimpleAgent:
-    def __init__(self, model_name: str = "grok-3-mini", api_key: str = "xai-key"):
+    def __init__(self, model_name: str = "grok-3-mini", api_key: str = "xai-kei"):
         self.model_name = model_name
         self.api_key = api_key
         self.tools = {}
@@ -26,13 +26,13 @@ class SimpleAgent:
         self.base_url = "https://api.x.ai/v1"
         self.system_prompt = (
             "You are a friendly, persuasive Sales AI chatbot. Your goal is to convince customers to keep their orders and explore more products. "
-            "Use 'handle_complaint' tool for cancellation or complaint requests with customer_id and style in JSON format, e.g., Tool Call: handle_complaint(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\"). "
-            "Use 'handle_general_question' tool for general questions with customer_id, style (optional), and question (passed as complaint when style is absent or extracted from complaint) in JSON format, e.g., Tool Call: handle_general_question(customer_id=\"CUST005\", style=\"AN209\", question=\"What are your latest products?\"). "
-            "Use 'mock_purchase' tool for purchase requests with customer_id and style in JSON format, e.g., Tool Call: mock_purchase(customer_id=\"CUST005\", style=\"AN209\"). "
-            "If no complaint or style is provided, assume it's the start of the chat and use a default like 'initial chat, ask what the customer needs help with'. "
-            "For questions about specific products, extract the style code from the complaint if not provided in style field and include product details. "
+            "Use 'handle_complaint' tool for cancellation or complaint requests with customer_id, style, and complaint in JSON format, e.g., Tool Call: handle_complaint(customer_id=\"CUST005\", style=\"AN201\", complaint=\"The earbuds stopped working\"). "
+            "Use 'handle_general_question' tool for general questions with customer_id, style (optional), and question (passed as complaint when style is absent or extracted from complaint) in JSON format, e.g., Tool Call: handle_general_question(customer_id=\"CUST005\", style=\"AN201\", question=\"What are the features of AN201?\"). "
+            "Use 'mock_purchase' tool for purchase requests with customer_id and style in JSON format, e.g., Tool Call: mock_purchase(customer_id=\"CUST005\", style=\"AN201\"). "
+            "If no complaint or style is provided, assume it's the start of the chat and use a default like 'Hello! How can I assist you today with our products, such as our latest wireless earbuds or other accessories?'. "
+            "For questions about specific products, extract the style code from the complaint if not provided in style field and include product details like description, price, color, accessory_type, features, and usage_type. "
             "For purchase requests, check for keywords like 'purchase', 'buy', or 'order' in the complaint and use the style field. "
-            "Keep responses short, engaging, and professional. Always recommend alternative products. "
+            "Keep responses short, engaging, and professional. Always recommend alternative products based on the customer's preferred category or product category, highlighting details like accessory_type, features, and usage_type. "
             "Check previous messages to avoid repetition and maintain coherent conversation using customer_id as reference."
         )
         self.cluster = Cluster(COUCHBASE_URL, ClusterOptions(PasswordAuthenticator(USERNAME, PASSWORD)))

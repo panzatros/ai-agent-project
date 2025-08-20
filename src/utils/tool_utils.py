@@ -2,6 +2,7 @@ import ollama
 import json
 import pytz
 import requests
+import re  # Added for style extraction in handle_general_question
 from datetime import datetime
 from typing import Dict, Callable, List
 from flask import Flask, request, jsonify
@@ -74,7 +75,8 @@ def get_sales_stats(style: str) -> Dict:
 
 def get_similar_products(category: str, exclude_style: str = None, limit: int = 3) -> list:
     try:
-        query = f"SELECT style, description, price, color, fit, occasion FROM {PRODUCTS_BUCKET_NAME} WHERE category = $1"
+        # Updated query to select fields from the new product structure
+        query = f"SELECT style, description, price, color, accessory_type, features, usage_type FROM {PRODUCTS_BUCKET_NAME} WHERE category = $1"
         params = [category]
         if exclude_style:
             query += " AND style != $2 LIMIT $3"
@@ -107,8 +109,11 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
         return f"No purchase of {style} found for customer {customer_id}."
 
     similar_products = get_similar_products(customer.get("preferred_category", product["category"]), style)
+    # Updated similar products text to use new fields
     similar_products_text = "\n".join([
-        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, Fit: {p['fit']}, Occasion: {p['occasion']})"
+        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, "
+        f"Type: {p.get('accessory_type', 'N/A')}, Features: {', '.join(p.get('features', [])) or 'None'}, "
+        f"Usage: {p.get('usage_type', 'N/A')})"
         for p in similar_products
     ]) if similar_products else "No similar products found."
 
@@ -120,18 +125,22 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
     else:
         discount_offer = "5% off your next purchase."
 
+    # Updated prompt to use new product fields
     if complaint:
         prompt = (
             f"Customer {customer['name']} ({customer['loyalty_level']}) complained about {style}: {product['description']} "
-            f"(${product['price']}, {product['color']}, {product['fit']}). Complaint: {complaint}. "
-            f"Preferred category: {customer['preferred_category']}. Alternatives: {similar_products_text}. "
+            f"(${product['price']}, {product['color']}, Type: {product.get('accessory_type', 'N/A')}, "
+            f"Features: {', '.join(product.get('features', [])) or 'None'}, Usage: {product.get('usage_type', 'N/A')}). "
+            f"Complaint: {complaint}. Preferred category: {customer['preferred_category']}. "
+            f"Alternatives: {similar_products_text}. "
             f"Respond briefly: empathize, apologize, offer {discount_offer} or replacement, suggest alternatives, and encourage further dialogue."
         )
     else:
         prompt = (
             f"Customer {customer['name']} ({customer['loyalty_level']}) wants to cancel {style}: {product['description']} "
-            f"(${product['price']}, {product['color']}, {product['fit']}). Preferred category: {customer['preferred_category']}. "
-            f"Alternatives: {similar_products_text}. "
+            f"(${product['price']}, {product['color']}, Type: {product.get('accessory_type', 'N/A')}, "
+            f"Features: {', '.join(product.get('features', [])) or 'None'}, Usage: {product.get('usage_type', 'N/A')}). "
+            f"Preferred category: {customer['preferred_category']}. Alternatives: {similar_products_text}. "
             f"Respond briefly: highlight product benefits, offer {discount_offer}, suggest alternatives, and note return option."
         )
 
@@ -179,8 +188,8 @@ def handle_general_question(customer_id: str, style: str, question: str, api_key
     # Check if question references a specific product style
     product_style = style
     if not product_style:
-        # Try to extract style from question (e.g., "AXSF" in "tell me about product AXSF")
-        style_match = re.search(r'\b[A-Z0-9]{4}\b', question)
+        # Try to extract style from question (e.g., "AN201" in "tell me about product AN201")
+        style_match = re.search(r'\b[A-Z0-9]{4,5}\b', question)
         product_style = style_match.group(0) if style_match else None
 
     product_details = ""
@@ -189,16 +198,21 @@ def handle_general_question(customer_id: str, style: str, question: str, api_key
         product = get_product(product_style)
         if product:
             category = product.get("category", category)
+            # Updated product details to use new fields
             product_details = (
                 f"{product['description']} (Style: {product_style}, Price: ${product['price']}, "
-                f"Color: {product['color']}, Fit: {product['fit']}, Occasion: {product['occasion']}). "
+                f"Color: {product['color']}, Type: {product.get('accessory_type', 'N/A')}, "
+                f"Features: {', '.join(product.get('features', [])) or 'None'}, Usage: {product.get('usage_type', 'N/A')}). "
             )
         else:
             product_details = f"Product style {product_style} not found. "
 
     similar_products = get_similar_products(category, product_style)
+    # Updated similar products text to use new fields
     similar_products_text = "\n".join([
-        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, Fit: {p['fit']}, Occasion: {p['occasion']})"
+        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, "
+        f"Type: {p.get('accessory_type', 'N/A')}, Features: {', '.join(p.get('features', [])) or 'None'}, "
+        f"Usage: {p.get('usage_type', 'N/A')})"
         for p in similar_products
     ]) if similar_products else "No similar products found."
 
@@ -210,6 +224,7 @@ def handle_general_question(customer_id: str, style: str, question: str, api_key
     else:
         discount_offer = "5% off your next purchase."
 
+    # Updated prompt to use new product fields
     prompt = (
         f"Customer {customer['name']} ({customer['loyalty_level']}) asked: {question}. "
         f"Preferred category: {category}. Purchase history: {json.dumps(customer['purchase_history'])}. "
@@ -284,8 +299,11 @@ def mock_purchase(customer_id: str, style: str, api_key: str, agent: 'SimpleAgen
         return f"Error updating purchase history: {str(e)}"
 
     similar_products = get_similar_products(product["category"], style)
+    # Updated similar products text to use new fields
     similar_products_text = "\n".join([
-        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, Fit: {p['fit']}, Occasion: {p['occasion']})"
+        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, "
+        f"Type: {p.get('accessory_type', 'N/A')}, Features: {', '.join(p.get('features', [])) or 'None'}, "
+        f"Usage: {p.get('usage_type', 'N/A')})"
         for p in similar_products
     ]) if similar_products else "No similar products found."
 
@@ -297,9 +315,11 @@ def mock_purchase(customer_id: str, style: str, api_key: str, agent: 'SimpleAgen
     else:
         discount_offer = "5% off your next purchase."
 
+    # Updated prompt to use new product fields
     prompt = (
         f"Customer {customer['name']} ({customer['loyalty_level']}) successfully purchased {style}: {product['description']} "
-        f"(${product['price']}, {product['color']}, {product['fit']}). "
+        f"(${product['price']}, {product['color']}, Type: {product.get('accessory_type', 'N/A')}, "
+        f"Features: {', '.join(product.get('features', [])) or 'None'}, Usage: {product.get('usage_type', 'N/A')}). "
         f"Preferred category: {customer.get('preferred_category', product['category'])}. "
         f"Recommended products: {similar_products_text}. "
         f"Respond briefly: confirm the purchase, highlight product benefits, offer {discount_offer}, suggest recommended products, and invite further questions."
@@ -311,7 +331,7 @@ def mock_purchase(customer_id: str, style: str, api_key: str, agent: 'SimpleAgen
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "grok-3",
+            "model": "grok-3-mini",  # Changed to grok-3-mini to match other methods
             "messages": [{"role": "user", "content": prompt}]
         }
         logger.debug(f"Sending Grok API request in mock_purchase: {json.dumps(payload, indent=2)}")
