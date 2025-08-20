@@ -67,3 +67,25 @@ handle_general_question_schema = {
         }
     }
 }
+
+mock_purchase_schema = {
+    "type": "function",
+    "function": {
+        "name": "mock_purchase",
+        "description": "Simulates a purchase by adding it to the customer's purchase history in Couchbase and generates a confirmation response with product recommendations.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
+                    "type": "string",
+                    "description": "The unique ID of the customer making the purchase."
+                },
+                "style": {
+                    "type": "string",
+                    "description": "The style code of the product being purchased."
+                }
+            },
+            "required": ["customer_id", "style"]
+        }
+    }
+}

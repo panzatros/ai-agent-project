@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, Blueprint
 #from agents.simple_agent import SimpleAgent
 from agents.grok_agent import SimpleAgent
 import json
-from utils.tool_utils import get_current_time, handle_complaint
-from utils.schemas import time_tool_schema, handle_complaint_schema
+from utils.tool_utils import get_current_time, handle_complaint, handle_general_question, mock_purchase
+from utils.schemas import time_tool_schema, handle_complaint_schema, handle_general_question_schema, mock_purchase_schema
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 agent = SimpleAgent()
 agent.register_tool(time_tool_schema, get_current_time)
 agent.register_tool(handle_complaint_schema, handle_complaint)
+agent.register_tool(handle_general_question_schema, handle_general_question)
+agent.register_tool(mock_purchase_schema, mock_purchase)
 # Create a Flask Blueprint for routes
 
 routes = Blueprint("routes", __name__)
@@ -90,16 +92,29 @@ def handle_complain():
         data = request.get_json()
         customer_id = data.get('customer_id')
         style = data.get('style')
-        complaint = data.get('complaint')  # Can be None for first-time cancellation
+        complaint = data.get('complaint')  # Can be None for first-time cancellation or mock purchase
+
         if not customer_id:
             return jsonify({"error": "Missing customer_id"}), 400
 
-        # Use the agent to call the handle_complaint tool
-        response = agent.chat(
-            f"Handle handle the following query form {customer_id} and productID (optional) {style or 'None'} with either a question, a complain or a cancelation request: {complaint or 'None'}",
-            customer_id=customer_id,
-            use_tools=True
-        )
+        # Check if the request is for a mock purchase (complaint contains "purchase" or "buy")
+        purchase_keywords = ["purchase", "buy", "order"]
+        is_purchase = complaint and any(keyword in complaint.lower() for keyword in purchase_keywords) and style
+
+        if is_purchase:
+            # Handle mock purchase
+            response = agent.chat(
+                f"Mock purchase for customer {customer_id} and productID {style}: {complaint or 'None'}",
+                customer_id=customer_id,
+                use_tools=True
+            )
+        else:
+            # Handle complaint, cancellation, or general question
+            response = agent.chat(
+                f"Handle the following query from {customer_id} and productID (optional) {style or 'None'} with either a question, a complaint or a cancellation request: {complaint or 'None'}",
+                customer_id=customer_id,
+                use_tools=True
+            )
         return jsonify({"message": response}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

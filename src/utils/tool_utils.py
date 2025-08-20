@@ -250,3 +250,91 @@ def handle_general_question(customer_id: str, style: str, question: str, api_key
         if agent:
             agent.save_conversation_turn(customer_id, "assistant", f"Error: {str(e)}")
         return f"Error generating message: {str(e)}"
+
+def mock_purchase(customer_id: str, style: str, api_key: str, agent: 'SimpleAgent' = None) -> str:
+    logger.debug(f"Mocking purchase for customer_id: {customer_id}, style: {style}")
+    
+    customer = get_customer(customer_id)
+    if not customer:
+        return f"Customer {customer_id} not found in Couchbase bucket '{CUSTOMERS_BUCKET_NAME}'."
+
+    product = get_product(style)
+    if not product:
+        return f"Product style {style} not found in Couchbase bucket '{PRODUCTS_BUCKET_NAME}'."
+
+    # Create mock purchase details matching the customer purchase history structure
+    purchase = {
+        "style": style,
+        "purchase_date": get_current_time(),
+        "quantity": 1,
+        "amount": round(product["price"], 2),
+        "status": "Ordered"
+    }
+
+    # Update customer's purchase history and related fields
+    try:
+        customer["purchase_history"] = customer.get("purchase_history", []) + [purchase]
+        customer["total_spent"] = round(customer.get("total_spent", 0) + purchase["amount"], 2)
+        customer["num_purchases"] = customer.get("num_purchases", 0) + 1
+        customer["last_purchase_date"] = purchase["purchase_date"]
+        customers_collection.upsert(customer_id, customer)
+        logger.debug(f"Updated purchase history for customer {customer_id}")
+    except Exception as e:
+        logger.error(f"Error updating purchase history for {customer_id}: {str(e)}")
+        return f"Error updating purchase history: {str(e)}"
+
+    similar_products = get_similar_products(product["category"], style)
+    similar_products_text = "\n".join([
+        f"- {p['description']} (Style: {p['style']}, Price: ${p['price']}, Color: {p['color']}, Fit: {p['fit']}, Occasion: {p['occasion']})"
+        for p in similar_products
+    ]) if similar_products else "No similar products found."
+
+    discount_offer = ""
+    if customer.get("loyalty_level") in ["Gold", "Platinum"]:
+        discount_offer = "15% off your next purchase or free shipping."
+    elif customer.get("loyalty_level") == "Silver":
+        discount_offer = "10% off your next purchase."
+    else:
+        discount_offer = "5% off your next purchase."
+
+    prompt = (
+        f"Customer {customer['name']} ({customer['loyalty_level']}) successfully purchased {style}: {product['description']} "
+        f"(${product['price']}, {product['color']}, {product['fit']}). "
+        f"Preferred category: {customer.get('preferred_category', product['category'])}. "
+        f"Recommended products: {similar_products_text}. "
+        f"Respond briefly: confirm the purchase, highlight product benefits, offer {discount_offer}, suggest recommended products, and invite further questions."
+    )
+
+    try:
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": "grok-3",
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        logger.debug(f"Sending Grok API request in mock_purchase: {json.dumps(payload, indent=2)}")
+        response = requests.post(
+            "https://api.x.ai/v1/chat/completions",
+            headers=headers,
+            json=payload
+        )
+        response.raise_for_status()
+        response_data = response.json()
+        logger.debug(f"Grok API response in mock_purchase: {json.dumps(response_data, indent=2)}")
+        message = response_data["choices"][0]["message"]["content"]
+        if agent:
+            agent.save_conversation_turn(customer_id, "assistant", message)
+        return f"{message}"
+    except requests.exceptions.HTTPError as e:
+        error_response = e.response.json() if e.response else {}
+        logger.error(f"HTTP error in mock_purchase: {e.response.status_code} - {json.dumps(error_response, indent=2)}")
+        if agent:
+            agent.save_conversation_turn(customer_id, "assistant", f"Error: HTTP {e.response.status_code}")
+        return f"Error generating message: HTTP {e.response.status_code} - {json.dumps(error_response, indent=2)}"
+    except Exception as e:
+        logger.error(f"Error in mock_purchase: {str(e)}")
+        if agent:
+            agent.save_conversation_turn(customer_id, "assistant", f"Error: {str(e)}")
+        return f"Error generating message: {str(e)}"
