@@ -115,35 +115,17 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
 
     if complaint:
         prompt = (
-            f"Customer {customer['name']} (email: {customer['email']}, loyalty: {customer['loyalty_level']}) "
-            f"has a follow-up complaint about their purchase of style {style}: {product['description']} "
-            f"(price: ${product['price']}, color: {product['color']}, fit: {product['fit']}, occasion: {product['occasion']}). "
-            f"Their complaint: {complaint}. "
-            f"Their purchase history: {json.dumps(customer['purchase_history'])}. "
-            f"Sales stats for this style: total orders {sales_stats['total_count']}, "
-            f"with statuses {json.dumps(sales_stats['status_counts'])}. "
-            f"Suggested alternative products in their preferred category ({customer['preferred_category']}): {similar_products_text}. "
-            f"Generate a polite, empathetic, and persuasive email response addressing their specific complaint. "
-            f"Acknowledge their issue, apologize sincerely, and offer tailored solutions such as a replacement, "
-            f"{discount_offer}, or a return option. Suggest alternative products from the provided list that align with their preferences. "
-            f"Emphasize the quality and benefits of the product they purchased and how the suggested alternatives meet their needs. "
-            f"Encourage them to continue the conversation if they’re still unsatisfied and highlight that their feedback is valued. "
-            f"Use a friendly, professional, and verbose tone to retain them as a customer."
+            f"Customer {customer['name']} ({customer['loyalty_level']}) complained about {style}: {product['description']} "
+            f"(${product['price']}, {product['color']}, {product['fit']}). Complaint: {complaint}. "
+            f"Preferred category: {customer['preferred_category']}. Alternatives: {similar_products_text}. "
+            f"Respond briefly: empathize, apologize, offer {discount_offer} or replacement, suggest alternatives, and encourage further dialogue."
         )
     else:
         prompt = (
-            f"Customer {customer['name']} (email: {customer['email']}, loyalty: {customer['loyalty_level']}) "
-            f"has requested to cancel their purchase of style {style}: {product['description']} "
-            f"(price: ${product['price']}, color: {product['color']}, fit: {product['fit']}, occasion: {product['occasion']}). "
-            f"Their purchase history: {json.dumps(customer['purchase_history'])}. "
-            f"Sales stats for this style: total orders {sales_stats['total_count']}, "
-            f"with statuses {json.dumps(sales_stats['status_counts'])}. "
-            f"Suggested alternative products in their preferred category ({customer['preferred_category']}): {similar_products_text}. "
-            f"Generate a polite, persuasive email message to convince them not to cancel. "
-            f"Suggest alternatives from the provided list that align with their preferences. "
-            f"Offer incentives like {discount_offer}. Highlight the benefits of the purchased product, "
-            f"such as quality, style, and suitability for their needs. Mention that they can return the product if not satisfied, "
-            f"but encourage them to give it a chance. Use a friendly, professional, and verbose tone to retain them as a customer."
+            f"Customer {customer['name']} ({customer['loyalty_level']}) wants to cancel {style}: {product['description']} "
+            f"(${product['price']}, {product['color']}, {product['fit']}). Preferred category: {customer['preferred_category']}. "
+            f"Alternatives: {similar_products_text}. "
+            f"Respond briefly: highlight product benefits, offer {discount_offer}, suggest alternatives, and note return option."
         )
 
     try:
@@ -168,7 +150,7 @@ def handle_complaint(customer_id: str, style: str, complaint: str, api_key: str,
         # Save the response to conversation history
         if agent:
             agent.save_conversation_turn(customer_id, "assistant", message)
-        return f"Generated message to send to {customer['email']}:\n\n{message}"
+        return f"{message}"
     except requests.exceptions.HTTPError as e:
         error_response = e.response.json() if e.response else {}
         logger.error(f"HTTP error in handle_complaint: {e.response.status_code} - {json.dumps(error_response, indent=2)}")

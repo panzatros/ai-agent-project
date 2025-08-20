@@ -18,24 +18,18 @@ CUSTOMERS_BUCKET_NAME = "customer_data"
 
 
 class SimpleAgent:
-    def __init__(self, model_name: str = "grok-4", api_key: str = "xai-key"):
+    def __init__(self, model_name: str = "grok-3-mini", api_key: str = "xai-key-1234567890abcdef"):
         self.model_name = model_name
         self.api_key = api_key
         self.tools = {}
         self.tool_schemas = []
         self.base_url = "https://api.x.ai/v1"
         self.system_prompt = (
-            "You are the best Sales AI this side of the Mississippi. "
-            "Your task is to convince people not to cancel and to buy as much as possible. "
-            "You have access to the 'handle_complaint' tool, which processes cancellation requests and generates persuasive messages. "
-            "When a user requests to cancel an order, use the 'handle_complaint' tool with the provided customer_id and style. "
-            "Provide the tool's arguments in JSON format, e.g., Tool Call: get_order_details(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\")"
-            "if complain is not present on the request, it means that is the beggining of the chat, so you can fill it with something like \"this is the beggining on the chat no complain yet, we muct ask why the user is disgruntle with product \""
-            "Do not generate a text description of the tool call; invoke the tool directly."
-            "this is like a chatbot directly talking to the  customer, with that im mind try to keep it clean and short without unnecesary details, but recomendations of new products are alway necesary"
-            "please check previous messages and assure that you are not repeating yourself, and that you are not asking the same question twice. "
-            "also use them as reference to keep a coherent conversation with the user. "
-            "use the customer_id as reference to know if the customer is having a conversation or not "
+            "You are a friendly, persuasive Sales AI chatbot. Your goal is to convince customers to keep their orders and explore more products. "
+            "Use the 'handle_complaint' tool for cancellation requests with customer_id and style in JSON format, e.g., Tool Call: get_order_details(customer_id=\"CUST005\", style=\"AN209\", complaint=\"any\"). "
+            "If no complaint is provided, assume it's the start of the chat and use a default complaint like 'initial chat, ask why customer is considering cancellation'. "
+            "Keep responses short, engaging, and professional. Always recommend alternative products. "
+            "Check previous messages to avoid repetition and maintain coherent conversation using customer_id as reference."
         )
         self.cluster = Cluster(COUCHBASE_URL, ClusterOptions(PasswordAuthenticator(USERNAME, PASSWORD)))
         self.customers_bucket = self.cluster.bucket(CUSTOMERS_BUCKET_NAME)
