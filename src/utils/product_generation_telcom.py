@@ -1,7 +1,6 @@
 import json
 import random
-from couchbase.cluster import Cluster
-from couchbase.options import ClusterOptions
+from couchbase.cluster import Cluster, ClusterOptions
 from couchbase.auth import PasswordAuthenticator
 from couchbase.exceptions import CouchbaseException
 from datetime import timedelta
@@ -9,47 +8,43 @@ from datetime import timedelta
 # Define description templates and attributes for telecom products
 templates = {
     "DP": [  # Data Plans
-        "Experience blazing-fast connectivity with this {data_type} data plan offering {data_limit} of high-speed data, perfect for {usage_type}. Includes {network_type} coverage and {additional_feature} for seamless usage.",
-        "Stay connected with our {data_type} plan, providing {data_limit} of data on a {network_type} network. Ideal for {usage_type}, with {additional_feature} to enhance your experience."
+        "Experience blazing-fast connectivity with this {data_amount} {network_type} data plan, perfect for {usage_type}. Includes {features} for an enhanced user experience.",
+        "Stay connected with our {data_amount} {network_type} plan, designed for {usage_type}. Enjoy {features} and reliable coverage for all your needs."
     ],
     "MP": [  # Mobile Phones
-        "The {brand} {model} smartphone, featuring a {screen_size}-inch display, {storage} storage, and {camera_specs} camera. Perfect for {usage_type}, with {additional_feature} and a {battery_life} battery.",
-        "Discover the {brand} {model}, a sleek device with {storage} of storage, a {screen_size}-inch screen, and {camera_specs} camera. Built for {usage_type}, it includes {additional_feature} and {battery_life} battery life."
+        "The {brand} {model} smartphone, featuring a {display_size}-inch display, {storage} storage, and {features}. Ideal for {usage_type}, this device offers {color} elegance and top-tier performance.",
+        "Discover the {brand} {model}, a {color} mobile phone with {storage} storage, {display_size}-inch screen, and {features}. Perfect for {usage_type} and built for reliability."
     ],
     "AC": [  # Accessories
-        "Enhance your device with this {accessory_type} in {color}, designed for {compatibility}. Features {additional_feature} and is ideal for {usage_type}.",
-        "This {color} {accessory_type} is crafted for {compatibility}, offering {additional_feature}. Perfect for {usage_type} to complement your telecom experience."
+        "Enhance your device with this {color} {accessory_type} from {brand}. Designed for {compatibility}, it offers {features} and is perfect for {usage_type}.",
+        "This {brand} {color} {accessory_type} is crafted for {compatibility}, featuring {features}. Ideal for {usage_type}, it combines style and functionality."
     ]
 }
 
 attributes = {
-    "data_type": ["unlimited", "prepaid", "postpaid", "family-shared", "business"],
-    "data_limit": ["5GB", "10GB", "20GB", "50GB", "unlimited"],
-    "network_type": ["4G LTE", "5G", "5G Ultra Wideband"],
-    "brand": ["Apple", "Samsung", "Google", "OnePlus", "Xiaomi"],
-    "model": ["iPhone 14 Pro", "Galaxy S23", "Pixel 7", "Nord 3", "Mi 13"],
-    "screen_size": ["6.1", "6.4", "6.7", "6.8", "7.0"],
-    "storage": ["128GB", "256GB", "512GB", "1TB"],
-    "camera_specs": ["12MP dual", "48MP triple", "50MP quad", "108MP advanced"],
-    "battery_life": ["long-lasting", "all-day", "extended", "up to 24 hours"],
-    "accessory_type": ["wireless charger", "protective case", "Bluetooth earbuds", "screen protector", "charging cable"],
-    "color": ["black", "silver", "blue", "red", "white"],
-    "compatibility": ["universal", "iPhone models", "Samsung Galaxy", "most Android devices"],
-    "additional_feature": ["priority customer support", "water resistance", "fast charging", "noise cancellation", "unlimited cloud backup"],
-    "usage_type": ["streaming and gaming", "work and productivity", "social media", "everyday use", "travel"]
+    "data_amount": ["1GB", "5GB", "10GB", "20GB", "50GB", "Unlimited"],
+    "network_type": ["4G", "5G"],
+    "brand": ["Samsung", "Apple", "Xiaomi", "OnePlus", "Google", "Sony"],
+    "model": ["Galaxy S23", "iPhone 15", "Redmi Note 12", "Nord 3", "Pixel 8", "Xperia 5"],
+    "display_size": ["6.1", "6.7", "6.4", "6.8", "6.2"],
+    "storage": ["64GB", "128GB", "256GB", "512GB", "1TB"],
+    "color": ["Midnight Black", "Starlight White", "Sky Blue", "Emerald Green", "Phantom Grey"],
+    "accessory_type": ["wireless earbuds", "fast charger", "protective case", "screen protector", "smartwatch"],
+    "compatibility": ["universal compatibility", "iOS devices", "Android devices", "specific models"],
+    "features": [
+        "unlimited calls and texts", "high-speed streaming", "advanced noise cancellation", 
+        "water-resistant design", "long-lasting battery", "wireless charging support",
+        "AMOLED display", "dual SIM support", "5G connectivity", "shockproof protection"
+    ],
+    "usage_type": ["daily browsing", "gaming", "streaming", "professional use", "travel", "fitness tracking"]
 }
 
 # Price ranges by category
 price_ranges = {
     "Data Plans": (10.00, 80.00),
-    "Mobile Phones": (299.00, 1499.00),
-    "Accessories": (9.99, 99.99)
+    "Mobile Phones": (200.00, 1500.00),
+    "Accessories": (15.00, 200.00)
 }
-
-# Additional attributes for sales
-stock_status = ["in stock", "low stock", "out of stock"]
-warranty_options = ["1-year limited", "2-year extended", "90-day standard"]
-rating_options = [3.5, 3.8, 4.0, 4.2, 4.5, 4.8, 5.0]
 
 # Function to determine category from style
 def get_category(style):
@@ -57,76 +52,106 @@ def get_category(style):
         return "Data Plans"
     elif style.startswith("MP"):
         return "Mobile Phones"
-    elif style.startswith("AC"):
+    else:  # AC
         return "Accessories"
-    else:
-        return "Unknown"
 
 # Function to generate a random description and product details
 def generate_product_details(style):
     category = get_category(style)
-    category_key = style[:2] if style.startswith(("DP", "MP", "AC")) else "DP"
+    category_key = style[:2] if style.startswith(("DP", "MP", "AC")) else "AC"
     template = random.choice(templates[category_key])
     
     # Select random attributes based on category
     if category == "Data Plans":
-        selected_attributes = {
-            "data_type": random.choice(attributes["data_type"]),
-            "data_limit": random.choice(attributes["data_limit"]),
-            "network_type": random.choice(attributes["network_type"]),
-            "additional_feature": random.choice(attributes["additional_feature"]),
-            "usage_type": random.choice(attributes["usage_type"])
+        data_amount = random.choice(attributes["data_amount"])
+        network_type = random.choice(attributes["network_type"])
+        features = ", ".join(random.sample(attributes["features"], 2))  # Pick 2 features
+        usage_type = random.choice(attributes["usage_type"])
+        description = template.format(
+            data_amount=data_amount,
+            network_type=network_type,
+            features=features,
+            usage_type=usage_type
+        )
+        product_doc = {
+            "description": description,
+            "data_amount": data_amount,
+            "network_type": network_type,
+            "features": features.split(", "),
+            "usage_type": usage_type
         }
     elif category == "Mobile Phones":
-        selected_attributes = {
-            "brand": random.choice(attributes["brand"]),
-            "model": random.choice(attributes["model"]),
-            "screen_size": random.choice(attributes["screen_size"]),
-            "storage": random.choice(attributes["storage"]),
-            "camera_specs": random.choice(attributes["camera_specs"]),
-            "battery_life": random.choice(attributes["battery_life"]),
-            "additional_feature": random.choice(attributes["additional_feature"]),
-            "usage_type": random.choice(attributes["usage_type"])
+        brand = random.choice(attributes["brand"])
+        model = random.choice(attributes["model"])
+        display_size = random.choice(attributes["display_size"])
+        storage = random.choice(attributes["storage"])
+        color = random.choice(attributes["color"])
+        features = ", ".join(random.sample(attributes["features"], 3))  # Pick 3 features
+        usage_type = random.choice(attributes["usage_type"])
+        description = template.format(
+            brand=brand,
+            model=model,
+            display_size=display_size,
+            storage=storage,
+            color=color,
+            features=features,
+            usage_type=usage_type
+        )
+        product_doc = {
+            "description": description,
+            "brand": brand,
+            "model": model,
+            "display_size": display_size,
+            "storage": storage,
+            "color": color,
+            "features": features.split(", "),
+            "usage_type": usage_type
         }
     else:  # Accessories
-        selected_attributes = {
-            "accessory_type": random.choice(attributes["accessory_type"]),
-            "color": random.choice(attributes["color"]),
-            "compatibility": random.choice(attributes["compatibility"]),
-            "additional_feature": random.choice(attributes["additional_feature"]),
-            "usage_type": random.choice(attributes["usage_type"])
+        brand = random.choice(attributes["brand"])
+        accessory_type = random.choice(attributes["accessory_type"])
+        color = random.choice(attributes["color"])
+        compatibility = random.choice(attributes["compatibility"])
+        features = ", ".join(random.sample(attributes["features"], 2))  # Pick 2 features
+        usage_type = random.choice(attributes["usage_type"])
+        description = template.format(
+            brand=brand,
+            color=color,
+            accessory_type=accessory_type,
+            compatibility=compatibility,
+            features=features,
+            usage_type=usage_type
+        )
+        product_doc = {
+            "description": description,
+            "brand": brand,
+            "accessory_type": accessory_type,
+            "color": color,
+            "compatibility": compatibility,
+            "features": features.split(", "),
+            "usage_type": usage_type
         }
-    
-    # Generate description
-    description = template.format(**selected_attributes)
     
     # Generate random price within category range
     min_price, max_price = price_ranges[category]
     price = round(random.uniform(min_price, max_price), 2)
+    product_doc["price"] = price
+    product_doc["category"] = category
+    product_doc["style"] = style
     
-    # Generate additional sales attributes
-    stock = random.choice(stock_status)
-    warranty = random.choice(warranty_options)
-    rating = random.choice(rating_options)
+    # Add sales-relevant fields
+    product_doc["stock_quantity"] = random.randint(0, 100)  # Random stock quantity
+    product_doc["warranty"] = random.choice(["1 year", "2 years", "6 months", "No warranty"])  # Warranty info
+    product_doc["release_date"] = f"202{random.randint(3, 5)}-{random.randint(1, 12):02d}-01"  # Random release date
     
-    # Merge attributes
-    product_details = {
-        "description": description,
-        "price": price,
-        "stock_status": stock,
-        "warranty": warranty,
-        "customer_rating": rating,
-        **selected_attributes
-    }
-    
-    return product_details
+    return product_doc
 
 # Path to the JSON file
-csv_file = r"C:\Users\ragde\Desktop\products.json"
+json_file = r"C:\Users\ragde\Desktop\products.json"
 
 # Load the products dataset
 try:
-    with open(csv_file, "r") as file:
+    with open(json_file, "r") as file:
         products = json.load(file)
 except FileNotFoundError:
     print("Error: products.json not found")
@@ -143,13 +168,8 @@ try:
     collection = bucket.default_collection()  # Default collection
 
     # Upsert each product as a document
-    for style in products.get("style_status_counts", {}).keys():
-        product_details = generate_product_details(style)
-        product_doc = {
-            "style": style,
-            "category": get_category(style),
-            **product_details
-        }
+    for style in products.keys():
+        product_doc = generate_product_details(style)
         result = collection.upsert(style, product_doc)
         print(f"Successfully upserted product {style} with CAS: {result.cas}")
 
